@@ -42,10 +42,14 @@ if (!$('.demo').length) return;
 	var flipsnap = Flipsnap('#demo-pointmove .flipsnap', {
 		distance: 230
 	});
-	flipsnap.element.addEventListener('fspointmove', function() {
-		$pointer.filter('.current').removeClass('current');
-		$pointer.eq(flipsnap.currentPoint).addClass('current');
-	}, false);
+	//flipsnap.element.addEventListener('fspointmove', function() {
+	//	$pointer.filter('.current').removeClass('current');
+	//	$pointer.eq(flipsnap.currentPoint).addClass('current');
+	//}, false);
+  $(flipsnap.element).on('fspointmove', function() {
+  	$pointer.filter('.current').removeClass('current');
+  	$pointer.eq(flipsnap.currentPoint).addClass('current');
+  }, false);
 
 	var $next = $demo.find(".next").click(function() {
 		flipsnap.toNext();
@@ -53,7 +57,11 @@ if (!$('.demo').length) return;
 	var $prev = $demo.find(".prev").click(function() {
 		flipsnap.toPrev();
 	});
-	flipsnap.element.addEventListener('fspointmove', function() {
+	//flipsnap.element.addEventListener('fspointmove', function() {
+	//	$next.attr("disabled", !flipsnap.hasNext());
+	//	$prev.attr("disabled", !flipsnap.hasPrev());
+	//}, false);
+	$(flipsnap.element).on('fspointmove', function() {
 		$next.attr("disabled", !flipsnap.hasNext());
 		$prev.attr("disabled", !flipsnap.hasPrev());
 	}, false);
@@ -66,11 +74,21 @@ if (!$('.demo').length) return;
 	var flipsnap = Flipsnap('#demo-touchevents .flipsnap', {
 		distance: 230
 	});
-	flipsnap.element.addEventListener('fstouchstart', function(ev) {
+	//flipsnap.element.addEventListener('fstouchstart', function(ev) {
+	//	$event.text('fstouchstart');
+	//}, false);
+	$(flipsnap.element).on('fstouchstart', function(ev) {
 		$event.text('fstouchstart');
 	}, false);
 
-	flipsnap.element.addEventListener('fstouchmove', function(ev) {
+	//flipsnap.element.addEventListener('fstouchmove', function(ev) {
+	//	$event.text('fstouchmove');
+	//	$detail.text(JSON.stringify({
+	//		delta: ev.delta,
+	//		direction: ev.direction
+	//	}, null, 2));
+	//}, false);
+	$(flipsnap.element).on('fstouchmove', function(ev) {
 		$event.text('fstouchmove');
 		$detail.text(JSON.stringify({
 			delta: ev.delta,
@@ -78,7 +96,16 @@ if (!$('.demo').length) return;
 		}, null, 2));
 	}, false);
 
-	flipsnap.element.addEventListener('fstouchend', function(ev) {
+	//flipsnap.element.addEventListener('fstouchend', function(ev) {
+	//	$event.text('fstouchend');
+	//	$detail.text(JSON.stringify({
+	//		moved: ev.moved,
+	//		originalPoint: ev.originalPoint,
+	//		newPoint: ev.newPoint,
+	//		cancelled: ev.cancelled
+	//	}, null, 2));
+	//}, false);
+	$(flipsnap.element).on('fstouchend', function(ev) {
 		$event.text('fstouchend');
 		$detail.text(JSON.stringify({
 			moved: ev.moved,
@@ -94,7 +121,12 @@ if (!$('.demo').length) return;
 	var flipsnap = Flipsnap('#demo-cancelmove .flipsnap', {
 		distance: 230
 	});
-	flipsnap.element.addEventListener('fstouchmove', function(ev) {
+	//flipsnap.element.addEventListener('fstouchmove', function(ev) {
+	//	if (ev.direction === -1) {
+	//		ev.preventDefault();
+	//	}
+	//}, false);
+	$(flipsnap.element).on('fstouchmove', function(ev) {
 		if (ev.direction === -1) {
 			ev.preventDefault();
 		}
@@ -160,7 +192,11 @@ if (!$('.demo').length) return;
 	var $prev = $demo.find(".prev").click(function() {
 		flipsnap.toPrev();
 	});
-	flipsnap.element.addEventListener('fspointmove', function() {
+	//flipsnap.element.addEventListener('fspointmove', function() {
+	//	$next.attr("disabled", !flipsnap.hasNext());
+	//	$prev.attr("disabled", !flipsnap.hasPrev());
+	//}, false);
+	$(flipsnap.element).on('fspointmove', function() {
 		$next.attr("disabled", !flipsnap.hasNext());
 		$prev.attr("disabled", !flipsnap.hasPrev());
 	}, false);
@@ -202,7 +238,11 @@ if (!$('.demo').length) return;
 	var $prev = $demo.find(".prev").click(function() {
 		flipsnap.toPrev();
 	});
-	flipsnap.element.addEventListener('fspointmove', function() {
+	//flipsnap.element.addEventListener('fspointmove', function() {
+	//	$next.attr("disabled", !flipsnap.hasNext());
+	//	$prev.attr("disabled", !flipsnap.hasPrev());
+	//}, false);
+	$(flipsnap.element).on('fspointmove', function() {
 		$next.attr("disabled", !flipsnap.hasNext());
 		$prev.attr("disabled", !flipsnap.hasPrev());
 	}, false);

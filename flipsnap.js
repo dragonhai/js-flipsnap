@@ -53,7 +53,7 @@ support.transition = hasProp([
 ]);
 
 support.addEventListener = 'addEventListener' in window;
-support.mspointer = window.navigator.msPointerEnabled;
+support.mspointer = !!window.navigator.msPointerEnabled;
 
 support.cssAnimation = (support.transform3d || support.transform) && support.transition;
 
@@ -145,7 +145,11 @@ Flipsnap.prototype.init = function(element, opts) {
   self.refresh();
 
   eventTypes.forEach(function(type) {
-    self.element.addEventListener(events.start[type], self, false);
+    // FIXME: convert jQuery to navtive
+    //self.element.addEventListener(events.start[type], self, false);
+    $(self.element).on(events.start[type], function (event) {
+      self.handleEvent.call(self, event);
+    });
   });
 
   return self;
@@ -306,8 +310,15 @@ Flipsnap.prototype._touchStart = function(event, type) {
     return;
   }
 
-  self.element.addEventListener(events.move[type], self, false);
-  document.addEventListener(events.end[type], self, false);
+  // FIXME: convert jQuery to navtive
+  //self.element.addEventListener(events.move[type], self, false);
+  $(self.element).on(events.move[type], function(event) {
+    self.handleEvent.call(self, event);
+  });
+  //document.addEventListener(events.end[type], self, false);
+  $(document).on(events.end[type], function(event) {
+    self.handleEvent.call(self, event);
+  });
 
   var tagName = event.target.tagName;
   if (type === 'mouse' && tagName !== 'SELECT' && tagName !== 'INPUT' && tagName !== 'TEXTAREA' && tagName !== 'BUTTON') {
@@ -326,7 +337,7 @@ Flipsnap.prototype._touchStart = function(event, type) {
   self.startPageY = getPage(event, 'pageY');
   self.basePageX = self.startPageX;
   self.directionX = 0;
-  self.startTime = event.timeStamp;
+  self.startTime = event.timeStamp || new Date().getTime();
   self._triggerEvent('fstouchstart', true, false);
 };
 
@@ -382,7 +393,12 @@ Flipsnap.prototype._touchMove = function(event, type) {
       if (getAngle(triangle) > ANGLE_THREHOLD) {
         event.preventDefault();
         self.moveReady = true;
-        self.element.addEventListener('click', self, true);
+
+        // FIXME: convert jQuery to navtive
+        //self.element.addEventListener('click', self, true);
+        $(self.element).on('click', function(e){
+          self.handleEvent.call(self, event);
+        });
       }
       else {
         self.scrolling = false;
@@ -396,8 +412,15 @@ Flipsnap.prototype._touchMove = function(event, type) {
 Flipsnap.prototype._touchEnd = function(event, type) {
   var self = this;
 
-  self.element.removeEventListener(events.move[type], self, false);
-  document.removeEventListener(events.end[type], self, false);
+  // FIXME: convert jQuery to navtive
+  //self.element.removeEventListener(events.move[type], self, false);
+  $(self.element).off(events.move[type], function (event) {
+    self.handleEvent.call(self, event);
+  });
+  //document.removeEventListener(events.end[type], self, false);
+  $(document).off(events.end[type], function (event) {
+    self.handleEvent.call(self, event);
+  });
 
   if (!self.scrolling) {
     return;
@@ -432,7 +455,6 @@ Flipsnap.prototype._touchEnd = function(event, type) {
 
 Flipsnap.prototype._click = function(event) {
   var self = this;
-
   event.stopPropagation();
   event.preventDefault();
 };
@@ -444,7 +466,11 @@ Flipsnap.prototype._touchAfter = function(params) {
   self.moveReady = false;
 
   setTimeout(function() {
-    self.element.removeEventListener('click', self, true);
+
+    // FIXME: convert jQuery to navtive
+    $(self.element).off('click', function(event){
+      self.handleEvent.call(self, event);
+    });
   }, 200);
 
   self._triggerEvent('fstouchend', true, false, params);
@@ -468,7 +494,11 @@ Flipsnap.prototype._animate = function(x, transitionDuration) {
   var to = x;
   var duration = parseInt(transitionDuration, 10);
   var easing = function(time, duration) {
-    return -(time /= duration) * (time - 2);
+
+    // @fixed: reference on IE8
+    // return -(time /= duration) * (time - 2);
+    var tmp = time / duration;
+    return - tmp * (tmp - 2);
   };
 
   if (self.timerId) {
@@ -509,9 +539,8 @@ Flipsnap.prototype._getTranslate = function(x) {
 Flipsnap.prototype._triggerEvent = function(type, bubbles, cancelable, data) {
   var self = this;
 
-  var ev = document.createEvent('Event');
-  ev.initEvent(type, bubbles, cancelable);
-
+  // FIXME: convert jQuery to navtive
+  var ev = $.Event(type);
   if (data) {
     for (var d in data) {
       if (data.hasOwnProperty(d)) {
@@ -519,12 +548,19 @@ Flipsnap.prototype._triggerEvent = function(type, bubbles, cancelable, data) {
       }
     }
   }
-
-  return self.element.dispatchEvent(ev);
+  return $(self.element).trigger(ev);
 };
 
 function getPage(event, page) {
-  return event.changedTouches ? event.changedTouches[0][page] : event[page];
+  var position;
+  if(page === 'pageX'){
+    position = event['pageX'] || event['clientX'];
+  } else if(page === 'pageY'){
+    position = event['pageY'] || event['clientY'];
+  }
+
+  // FIXME: on mobile
+  return position; //event.changedTouches ? event.changedTouches[0][page] : event[page];
 }
 
 function hasProp(props) {

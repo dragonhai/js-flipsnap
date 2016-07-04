@@ -11,13 +11,17 @@
 
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define([], factory);
+    define(['jquery'], function($){
+      root.Flipsnap = factory($);
+    });
   } else if (typeof exports === 'object') {
-    module.exports = factory();
+    var $;
+    try { $ = require('jquery'); } catch (e) {}
+    module.exports = factory($);
   } else {
-    root.Flipsnap = factory();
+    root.Flipsnap = factory((root.jQuery || root.Zepto || root.ender || root.$));
   }
-})(this, function() {
+})(this, function($) {
 
 var div = document.createElement('div');
 var prefix = ['webkit', 'moz', 'o', 'ms'];
@@ -217,7 +221,7 @@ Flipsnap.prototype.refresh = function() {
 
 Flipsnap.prototype.hasNext = function() {
   var self = this;
-
+  console.log(self.currentPoint, self._maxPoint);
   return self.currentPoint < self._maxPoint;
 };
 
@@ -559,8 +563,7 @@ function getPage(event, page) {
     position = event['pageY'] || event['clientY'];
   }
 
-  // FIXME: on mobile
-  return position; //event.changedTouches ? event.changedTouches[0][page] : event[page];
+  return event.originalEvent.changedTouches ? event.originalEvent.changedTouches[0][page] : position;
 }
 
 function hasProp(props) {
